@@ -4,7 +4,7 @@ import Slide from "./components/Slide";
 import Home from "./components/Home";
 import Recent from "./components/Recent";
 import TopRated from "./components/TopRated";
-import GreatOfAllTime from "./components/GreatOfAllTime";
+import GreatOfAllTime from "./components/GreatofAllTime";
 import Fav from "./components/Fav";
 
 function App() {
