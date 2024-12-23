@@ -6,7 +6,7 @@ import { GiIndiaGate, GiWorld } from "react-icons/gi";
 function Slide({ onMenuClick }) {
   return (
     <>
-      <div className="slide bg-gray-900 text-white h-screen p-5">
+      <div className="slide fixed left-0 top-0 bottom-0 overflow-y-auto bg-gray-900 text-white h-screen p-5">
         
         <div className="flex items-center space-x-4">
           <img

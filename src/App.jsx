@@ -33,10 +33,8 @@ function App() {
 
   return (
     <div className="flex">
-      {/* Sidebar */}
       <Slide onMenuClick={handleMenuClick} />
 
-      {/* Dynamic Content */}
       <div className="flex-1 p-5 bg-gray-100">{renderContent()}</div>
     </div>
   );

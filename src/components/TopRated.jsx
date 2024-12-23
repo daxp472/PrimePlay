@@ -1,88 +1,108 @@
 import React, { useState, useEffect } from "react";
 import "../index.css";
 
-const apiKey = "42a126f0"; 
-const moviesPerPage = 15;
+const apiKey = "42a126f0";
+const moviesPerPage = 20;
 
 function TopRated() {
   const [movies, setMovies] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [selectedMovie, setSelectedMovie] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const movieTitles = [
+    "The Flash", "The Walking Dead"
+  ];
+
+
 
   useEffect(() => {
     const fetchMovies = async () => {
       try {
-        const response = await fetch(
-          `http://www.omdbapi.com/?apikey=${apiKey}&s=top+rated&type=movie&page=${currentPage}`
+        const movieData = await Promise.all(
+          movieTitles.map((title) =>
+            fetch(`http://www.omdbapi.com/?t=${title}&apikey=${apiKey}`)
+              .then((response) => response.json())
+              .then((data) => data)
+          )
         );
-        const data = await response.json();
-        if (data.Response === "True") {
-          setMovies(data.Search); 
-        }
+
+        setMovies(movieData);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching movie data:", error);
         setLoading(false);
       }
     };
-
     fetchMovies();
-  }, [currentPage]);
+  }, []);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  const handleMovieClick = (movie) => setSelectedMovie(movie);
+  const closeModal = () => setSelectedMovie(null);
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  const totalPages = Math.ceil(100 / moviesPerPage);
+  const handleSearch = (e) => setSearchQuery(e.target.value);
 
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
+  const filteredMovies = movies.filter((movie) =>
+    movie.Title?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const indexOfLastMovie = currentPage * moviesPerPage;
+  const indexOfFirstMovie = indexOfLastMovie - moviesPerPage;
+  const currentMovies = filteredMovies.slice(indexOfFirstMovie, indexOfLastMovie);
+  const totalPages = Math.ceil(filteredMovies.length / moviesPerPage);
+
+  if (loading) return <div className="text-center mt-20 text-2xl">Loading...</div>;
 
   return (
-    <div className="p-5">
-      <h1 className="text-3xl font-bold mb-4">Top Rated Movies</h1>
-      <p className="text-gray-700">
-        Discover the movies that have received the highest ratings and love from fans and critics worldwide.
-      </p>
+    <div>
+      {/* Search bar */}
+      <input
+        type="text"
+        value={searchQuery}
+        onChange={handleSearch}
+        placeholder="Search movies..."
+        className="search-input"
+      />
 
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mt-5">
-        {movies.map((movie, index) => (
-          <div key={index} className="bg-white rounded-lg shadow-md p-4">
-            <img
-              src={movie.Poster !== "N/A" ? movie.Poster : "https://via.placeholder.com/300x400"}
-              alt="Movie Poster"
-              className="rounded-md mb-4"
-            />
-            <h2 className="text-xl font-bold">{movie.Title}</h2>
-            <p className="text-gray-600">{movie.Year} • {movie.Type}</p>
-            <p className="text-yellow-500 font-semibold">⭐ {movie.imdbRating}/10</p>
-            <button
-              onClick={() => window.open(`https://www.imdb.com/title/${movie.imdbID}`, "_blank")}
-              className="mt-3 text-blue-500 hover:underline"
-            >
-              More Details
-            </button>
+      {/* Movie list */}
+      <div className="movie-list">
+        {currentMovies.map((movie) => (
+          <div key={movie.imdbID} onClick={() => handleMovieClick(movie)}>
+            <h3>{movie.Title}</h3>
+            <img src={movie.Poster} alt={movie.Title} />
           </div>
         ))}
       </div>
 
-      <div className="flex justify-center mt-5">
+      {/* Pagination */}
+      <div className="pagination">
         <button
-          onClick={() => handlePageChange(currentPage - 1)}
+          onClick={() => paginate(currentPage - 1)}
           disabled={currentPage === 1}
-          className="px-4 py-2 bg-gray-500 text-white rounded-lg mr-2"
         >
           Previous
         </button>
         <button
-          onClick={() => handlePageChange(currentPage + 1)}
+          onClick={() => paginate(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className="px-4 py-2 bg-gray-500 text-white rounded-lg"
         >
           Next
         </button>
       </div>
+
+      {/* Movie Modal */}
+      {selectedMovie && (
+        <div className="modal">
+          <button onClick={closeModal}>Close</button>
+          <div>
+            <h2>{selectedMovie.Title}</h2>
+            <p>{selectedMovie.Plot}</p>
+            <img src={selectedMovie.Poster} alt={selectedMovie.Title} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
