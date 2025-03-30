@@ -2,7 +2,7 @@
 
 Primeplay is a dynamic movie search application built with React and TailwindCSS, designed to fetch and display movie details using an API. The app provides a sleek, modern interface for users to search and explore movies, displaying key information such as title, release year, ratings, and more.  
 
-🎬 **[Play Primeplay here!](https://primeplay-website.netlify.app/)**  
+🎬 **[Play Primeplay here!](https://resplendent-liger-8f09fe.netlify.app/)**  
 
 ---
 
